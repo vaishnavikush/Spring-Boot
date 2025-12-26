@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>People Master Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* RESET */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    body {
+      background: linear-gradient(135deg, #f7a6a6, #ecff7f);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.45);
+    }
+
+    h2 {
+      text-align: center;
+      color: #f57420;
+      margin-bottom: 40px;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* TWO COLUMN GRID */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 30px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #222;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="file"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      transition: .25s ease;
+    }
+
+    textarea#people_bio {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #f4c22d;
+      box-shadow: 0 0 8px rgba(244,194,45,.45);
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%231f1f1f' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: #f57420;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    input[type="file"]::file-selector-button:hover { background: #d65e1a; }
+
+    /* SUBMIT */
+    .submit-wrapper {
+      grid-column: 1 / -1;
+      margin-top: 20px;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      background: #cc3333;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(204,51,51,.4);
+      transition: .2s ease;
+    }
+
+    input[type="submit"]:hover {
+      background: #a62828;
+      transform: translateY(-2px);
+    }
+
+    /* IMAGE PREVIEW */
+    .image-preview {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .image-preview img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #f4c22d;
+      box-shadow: 0 2px 10px rgba(0,0,0,.3);
+    }
+
+    /* DROPDOWN */
+    .dropdown { position: relative; }
+
+    .dropdown-btn {
+      width: 100%;
+      border: 1px solid #ccc;
+      padding: 12px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #fff;
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 100;
+      margin-top: 4px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.1);
+    }
+
+    .dropdown-content label {
+      padding: 10px 12px;
+      display: flex;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 400;
+    }
+
+    .dropdown-content label:hover { background: #f3f3f3; }
+
+    /* TABLET */
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .form-container {
+        padding: 35px 30px;
+        max-width: 600px;
+      }
+
+      h2 { font-size: 1.8rem; }
+    }
+
+    /* MOBILE */
+    @media (max-width: 480px) {
+      .form-container { padding: 26px 22px; }
+      h2 { font-size: 1.5rem; margin-bottom: 30px; }
+      .image-preview img { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>Crew Form</h2>
+
+  <form method="post" action="/peopleset" enctype="multipart/form-data">
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="people_name">Crew Name:</label>
+        <input type="text" name="peopleName" id="people_name" placeholder="Enter full name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Crew Role:</label>
+        <select name="role" id="role" required>
+          <option value="">-- Select Role --</option>
+          <option value="Actor">Actor</option>
+          <option value="Actress">Actress</option>
+          <option value="Director">Director</option>
+          <option value="Producer">Producer</option>
+          <option value="Editor">Editor</option>
+          <option value="Music Director">Music Director</option>
+        </select>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="people_bio">Crew Bio:</label>
+        <textarea name="people_bio" id="people_bio" placeholder="Enter bio" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="people_dob">Crew Date of Birth:</label>
+        <input type="date" name="people_dob" id="people_dob" required>
+      </div>
+
+      <div class="form-group">
+        <label>Crew Awards:</label>
+        <div class="dropdown">
+          <div class="dropdown-btn" id="dropdownBtn">-- Select Awards --</div>
+          <div class="dropdown-content" id="dropdownContent">
+            <label><input type="checkbox" value="National Film Awards"> National Film Awards</label>
+            <label><input type="checkbox" value="Filmfare Awards"> Filmfare Awards</label>
+            <label><input type="checkbox" value="IIFA Awards"> IIFA Awards</label>
+            <label><input type="checkbox" value="Screen Awards"> Screen Awards</label>
+            <label><input type="checkbox" value="Zee Cine Awards"> Zee Cine Awards</label>
+            <label><input type="checkbox" value="Dadasaheb Phalke Award"> Dadasaheb Phalke Award</label>
+            <label><input type="checkbox" value="Filmfare Critics Awards"> Filmfare Critics Awards</label>
+            <label><input type="checkbox" value="SIIMA Awards"> SIIMA Awards</label>
+            <label><input type="checkbox" value="Filmfare Awards South"> Filmfare Awards South</label>
+            <label><input type="checkbox" value="State Film Awards"> State Film Awards</label>
+          </div>
+        </div>
+        <input type="hidden" name="people_awards" id="selected_awards">
+      </div>
+
+      <div class="form-group">
+        <label for="people_debut">Crew Debut Name:</label>
+        <input type="text" name="people_debut" id="people_debut" required>
+      </div>
+
+      <div class="form-group">
+        <label for="debut_date">Crew Debut Year:</label>
+        <input type="text" name="debut_date" id="debut_date" required>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="image">Crew Image:</label>
+        <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(event)" required>
+        <div class="image-preview">
+          <img id="preview" style="display:none">
+        </div>
+      </div>
+
+      <div class="submit-wrapper">
+        <input type="submit" value="Save People">
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<script>
+  function previewImage(e) {
+    const img = document.getElementById('preview');
+    img.src = URL.createObjectURL(e.target.files[0]);
+    img.style.display = 'block';
+    img.onload = () => URL.revokeObjectURL(img.src);
+  }
+
+  const btn = document.getElementById('dropdownBtn');
+  const content = document.getElementById('dropdownContent');
+  const hidden = document.getElementById('selected_awards');
+
+  btn.onclick = () => content.style.display = content.style.display === 'block' ? 'none' : 'block';
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.dropdown')) content.style.display = 'none';
+  });
+
+  content.addEventListener('change', () => {
+    const values = [...content.querySelectorAll('input:checked')].map(i => i.value);
+    hidden.value = values.join(', ');
+    btn.textContent = values.length ? values.join(', ') : '-- Select Awards --';
+  });
+</script>
+
+</body>
+</html>

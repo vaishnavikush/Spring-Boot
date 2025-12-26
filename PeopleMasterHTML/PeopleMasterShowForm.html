@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People Directory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
+    <style>
+
+        /* --- THEME COLORS --- */
+        :root {
+            --charcoal: #1f1f1f;
+            --cinematic-orange: #f57420;
+            --crimson-red: #cc3333;
+            --olive-gold: #c3b357;
+            --warm-gold: #f4c22d;
+            --pure-white: #ffffff;
+            --light-gray: #4a4a4a; /* For table rows */
+            --dark-gray: #333333; /* For table background */
+        }
+
+        /* ===== Base Styling ===== */
+        body {
+<!--            font-family: 'Poppins', sans-serif;-->
+<!--            background-color: var(&#45;&#45;charcoal); /* Apply Charcoal Background */-->
+font-family: Arial, sans-serif;
+background: linear-gradient(135deg, #f7a6a6, #ecff7f);
+            color: var(--pure-white);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--cinematic-orange); /* Apply Cinematic Orange */
+            margin-bottom: 5px;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(245, 116, 32, 0.5); /* Subtle glow effect */
+            text-transform: uppercase;
+        }
+
+        .container > p {
+            text-align: center;
+            color: var(--olive-gold);
+            margin-bottom: 25px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ===== Search Form Section - Using White BG for contrast or Dark BG for fully dark forms ===== */
+        .top-forms {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background-color: var(--dark-gray); /* Dark section background */
+            border-radius: 12px;
+            border-top: 4px solid var(--cinematic-orange); /* Orange highlight bar */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .top-forms form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .top-forms input,
+        .top-forms select {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+            font-size: 15px;
+            width: 180px;
+            outline: none;
+            background: var(--charcoal); /* Dark input field */
+            color: var(--pure-white);
+            transition: 0.3s;
+        }
+
+        .top-forms input::placeholder {
+            color: #999;
+        }
+
+        .top-forms input:focus,
+        .top-forms select:focus {
+            border-color: var(--cinematic-orange);
+            box-shadow: 0 0 0 2px rgba(245, 116, 32, 0.3);
+        }
+
+        /* Button Styling */
+        .top-forms button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        /* Search Button */
+        .top-forms form:first-child button {
+            background-color: var(--cinematic-orange);
+            color: var(--charcoal); /* Black text on orange */
+        }
+        .top-forms form:first-child button:hover {
+            background-color: #e06917; /* Darker orange */
+        }
+
+        /* Filter Button */
+        .top-forms form:nth-child(2) button {
+            background-color: var(--olive-gold);
+            color: var(--charcoal); /* Black text on gold */
+        }
+        .top-forms form:nth-child(2) button:hover {
+            background-color: #b3a54a; /* Darker gold */
+        }
+
+
+        /* ===== Table Styling ===== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--dark-gray); /* Dark table background */
+            border-radius: 12px;
+            overflow: hidden;
+            table-layout: fixed;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            min-width: 650px;
+        }
+
+        th, td {
+            vertical-align: middle;
+            text-align: left;
+        }
+
+        /* Responsive flexible column widths */
+        th:nth-child(1), td:nth-child(1) { width: 80px; } /* Photo */
+        th:nth-child(2), td:nth-child(2) { width: 180px; } /* Name */
+        th:nth-child(3), td:nth-child(3) { width: 140px; } /* Role */
+        th:nth-child(4), td:nth-child(4) {
+            width: 150px; /* Actions */
+            padding-right: 15px;
+            padding-left: 15px;
+            text-align: center;
+        }
+
+        /* Header */
+        thead {
+            background-color: var(--charcoal); /* Even darker header */
+            border-bottom: 3px solid var(--cinematic-orange);
+        }
+
+        thead th {
+            padding: 12px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--warm-gold); /* Gold text */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Body Rows */
+        tbody td {
+            padding: 10px 15px;
+            color: var(--pure-white); /* White text */
+            font-size: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: var(--light-gray); /* Lighter gray hover */
+        }
+
+        /* The last row border */
+        tbody tr:last-child td {
+             border-bottom: none;
+        }
+
+
+        /* ===== Profile Image ===== */
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--olive-gold); /* Olive Gold border */
+            transition: 0.3s;
+            box-shadow: 0 0 8px rgba(195, 179, 87, 0.4);
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+            border-color: var(--cinematic-orange);
+        }
+
+        /* ===== Action Buttons ===== */
+        .update-btn,
+        .delete-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .update-btn {
+            background: var(--warm-gold); /* Warm Gold for Update */
+            color: var(--charcoal);
+        }
+        .update-btn:hover { background: #e8b627; }
+
+        .delete-btn {
+            background: var(--crimson-red); /* Crimson Red for Delete */
+            color: var(--pure-white);
+        }
+        .delete-btn:hover { background: #a82a33; }
+
+        /* Tighter action area */
+        .action-area {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Increased gap for better touch targets */
+            width: 100%;
+        }
+
+        .action-area a {
+            text-decoration: none;
+        }
+
+        /* ===== RESPONSIVE BEHAVIOR ===== */
+
+        /* Medium Screens */
+        @media (max-width: 900px) {
+            th:nth-child(2), td:nth-child(2) { width: 150px; }
+            th:nth-child(3), td:nth-child(3) { width: 130px; }
+            th:nth-child(4), td:nth-child(4) { width: 140px; }
+        }
+
+        /* Small Screens */
+        @media (max-width: 700px) {
+            /* Keep table-layout: fixed if possible, use min-width instead */
+
+            .profile-img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .update-btn, .delete-btn {
+                padding: 6px 9px;
+                font-size: 12px;
+            }
+
+            th:nth-child(4), td:nth-child(4) {
+                width: 120px;
+            }
+        }
+
+        /* Extra Small Screens (Phones) */
+        @media (max-width: 500px) {
+            .container { padding: 15px; }
+            h1 { font-size: 30px; letter-spacing: 1px; }
+
+            .top-forms {
+                padding: 15px;
+                gap: 10px;
+            }
+            .top-forms input, .top-forms select {
+                width: 100%;
+                font-size: 14px;
+            }
+            .top-forms button {
+                width: 100%;
+            }
+
+            th, td {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+
+            .profile-img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .update-btn, .delete-btn {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
+            .action-area {
+                gap: 4px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>People Directory</h1>
+    <p>Cast & Crew Database</p>
+
+    <!-- Search Forms (Thymeleaf Unchanged) -->
+    <div class="top-forms">
+
+        <form th:action="@{/serachbyname}" method="get">
+            <input type="text" name="peopleName" placeholder="Search by name">
+            <button type="submit">Search</button>
+        </form>
+
+        <form th:action="@{/searchbyrole}" method="post">
+            <select name="role" required>
+                <option value="">-- Select Role --</option>
+                <option value="Actor">Actor</option>
+                <option value="Actress">Actress</option>
+                <option value="Director">Director</option>
+                <option value="Producer">Producer</option>
+                <option value="Editor">Editor</option>
+                <option value="Music Director">Music Director</option>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+
+    </div>
+
+    <!-- People Table -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- Thymeleaf Data Iteration (Unchanged) -->
+            <tr th:each="p : ${peopleshow}">
+                <td>
+                    <a th:href="@{/filmography}">
+                        <!-- Thymeleaf image path (Unchanged) -->
+                        <img th:src="@{/getimage/{pid}(pid=${p.pid})}" class="profile-img" alt="Profile">
+                    </a>
+                </td>
+
+                <td th:text="${p.peopleName}"></td>
+                <td th:text="${p.role}"></td>
+
+                <td>
+                    <div class="action-area">
+                        <!-- Thymeleaf update link (Unchanged) -->
+                        <a th:href="@{/updatepeople/{pid}(pid=${p.pid})}">
+                            <button type="button" class="update-btn">Update</button>
+                        </a>
+
+                        <!-- Thymeleaf delete link and confirm (Unchanged) -->
+<!--                        <a th:href="@{/delete/{pid}(pid=${p.pid})}">-->
+<!--                            <button type="button" class="delete-btn"-->
+<!--                                    onclick="return confirm('Are you sure you want to delete this person?')">-->
+<!--                                Delete-->
+<!--                            </button>-->
+<!--                        </a>-->
+                        <button type="button" class="delete-btn"
+                                th:attr="data-url=@{/delete/{pid}(pid=${p.pid})}"
+                                onclick="confirmDelete(this)">
+                            Delete
+                        </button>
+
+                        <script>
+                            function confirmDelete(button) {
+                                let url = button.getAttribute("data-url");
+
+                                Swal.fire({
+                                    title: "Are you sure?",
+                                    text: "You won't be able to undo this!",
+                                    icon: "warning",
+                                    iconColor: "#ff4e4e",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#d33",
+                                    cancelButtonColor: "#3085d6",
+                                    confirmButtonText: "Yes, delete!",
+                                    background: "#fff",
+                                    showClass: {
+                                        popup: "animate__animated animate__zoomIn"
+                                    },
+                                    hideClass: {
+                                        popup: "animate__animated animate__zoomOut"
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+
+                                        // beautiful success animation
+                                        Swal.fire({
+                                            title: "Deleted!",
+                                            text: "The item has been removed.",
+                                            icon: "success",
+                                            iconColor: "#4caf50",
+                                            timer: 1300,
+                                            showConfirmButton: false,
+                                            background: "#fff",
+                                            showClass: {
+                                                popup: "animate__animated animate__fadeInUp"
+                                            },
+                                            hideClass: {
+                                                popup: "animate__animated animate__fadeOutDown"
+                                            }
+                                        });
+
+                                        setTimeout(() => {
+                                            window.location.href = url;
+                                        }, 1300);
+                                    }
+                                });
+                            }
+                        </script>
+
+                        <!-- animation css (needed for effects) -->
+<!--                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>-->
+
+
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

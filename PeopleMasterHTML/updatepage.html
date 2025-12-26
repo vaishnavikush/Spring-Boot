@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Person</title>
+    <style>
+        /* Reset and base styles */
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          /* Poppins is requested, adding standard fallback */
+          font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+          /* Cinematic Theme Background: Charcoal Black to Dark Earthy Tone */
+<!--          background: linear-gradient(135deg, #1f1f1f, #4d3e3e);-->
+font-family: Arial, sans-serif;
+background: linear-gradient(135deg, #f7a6a6, #ecff7f);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+        }
+
+        .form-container {
+          background: #ffffff; /* White background for contrast/readability */
+          padding: 30px 40px;
+          border-radius: 15px;
+          /* Stronger shadow fitting a dramatic theme */
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          width: 100%;
+          max-width: 450px;
+          text-align: center;
+        }
+
+        h2 {
+          text-align: center;
+          /* Bright Orange / Pumpkin Orange Accent */
+          color: #f57420;
+          margin-bottom: 25px;
+          font-size: 1.8rem;
+          text-transform: uppercase;
+          letter-spacing: 2px; /* Increased letter spacing for drama */
+        }
+
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #1f1f1f; /* Charcoal Black text */
+          text-align: left;
+        }
+
+        input[type="text"],
+        select {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          font-size: 1rem;
+          margin-bottom: 20px;
+          transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+          /* Warm Gold / Golden Yellow Focus Highlight */
+          border-color: #f4c22d;
+          box-shadow: 0 0 8px rgba(244,194,45,0.5);
+          outline: none;
+        }
+
+        img {
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
+          /* Warm Gold Border */
+          border: 4px solid #f4c22d;
+          object-fit: cover;
+          margin: 15px 0 20px;
+        }
+
+        button {
+          width: 100%;
+          /* Strong Red (Crimson) for primary action */
+          background: #cc3333;
+          color: #ffffff;
+          font-size: 1.1rem;
+          font-weight: 700; /* Bolder text */
+          padding: 12px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.3s ease, transform 0.1s ease;
+          box-shadow: 0 4px 10px rgba(204, 51, 51, 0.4);
+        }
+
+        button:hover {
+          /* Slightly darker red on hover */
+          background: #a62828;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(204, 51, 51, 0.5);
+        }
+
+        a {
+          display: inline-block;
+          margin-top: 15px;
+          /* Bright Orange Link Color */
+          color: #f57420;
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 500;
+          transition: color 0.3s ease;
+        }
+
+        a:hover {
+          /* Darker link color on hover for visual feedback */
+          color: #cc3333;
+          text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+          .form-container {
+            padding: 25px 20px;
+            border-radius: 0; /* Full width on tiny screens */
+            box-shadow: none;
+          }
+
+          h2 {
+            font-size: 1.5rem;
+          }
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Edit Person</h2>
+    <form method="post" action="/updatepeople" th:object="${updatepeoplemaster}" enctype="multipart/form-data" >
+
+        <input type="hidden" th:field="*{pid}"/>
+
+        <label for="peopleName">Name:</label>
+        <input type="text" th:field="*{peopleName}" id="peopleName" required>
+
+        <label for="role">Role:</label>
+        <select th:field="*{role}" id="role" required>
+            <option value="">-- Select Role --</option>
+            <option value="Actor">Actor</option>
+            <option value="Actress">Actress</option>
+            <option value="Director">Director</option>
+            <option value="Producer">Producer</option>
+            <option value="Editor">Editor</option>
+            <option value="Music Director">Music Director</option>
+        </select>
+
+        <label for="image">Change Image:</label>
+        <input type="file" name="img" id="image">
+
+        <img th:src="@{/getimage/{pid}(pid=${pid})}"  width="150" height="150" alt="Person Image">
+
+
+        <button type="submit">Save Changes</button>
+    </form>
+    <a th:href="@{/setpeople}">← Back to People List</a>
+</div>
+
+</body>
+</html>
