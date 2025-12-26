@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Ratings for: [[${person.peopleName}]]</h2>
+
+<img th:src="@{/getimagerevi/{pid}(pid=${person.peopleId})}" width="100" />
+
+<table border="1">
+  <tr>
+    <th>Rating</th>
+    <th>Review Text</th>
+  </tr>
+
+  <tr th:each="r : ${ratings}">
+    <td th:text="${r.rating}"></td>
+    <td th:text="${r.reviewText}"></td>
+  </tr>
+</table>
+
+<a href="/showpeoplerevi">Back</a>
+
+</body>
+</html>
