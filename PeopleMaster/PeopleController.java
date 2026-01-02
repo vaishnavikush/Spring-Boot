@@ -40,7 +40,8 @@ public class PeopleController {
             if (!part.isEmpty()) {
                 finalName.append(Character.toUpperCase(part.charAt(0)))
                         .append(part.substring(1).toLowerCase())
-                        .append(" ");
+        
+                    .append(" ");
             }
         }
 
@@ -172,4 +173,5 @@ public class PeopleController {
     public String filmographypage(){
         return "PeopleMasterHTML/FilmoGraphyForm";
     }
+
 }
