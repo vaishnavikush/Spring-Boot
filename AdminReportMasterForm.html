@@ -287,7 +287,7 @@
 
   <div class="stats">
     <div class="stat-card">
-      <div class="stat-number" th:text="${showAllReports.size()}">47</div>
+      <div class="stat-number" th:text="${reportList.size()}">47</div>
       <div class="stat-label">Total Reports</div>
     </div>
     <div class="stat-card">
@@ -306,26 +306,25 @@
     <table>
       <thead>
       <tr>
-<!--        <th>Owner</th>-->
-<!--        <th>Reporter</th>-->
         <th>Reason</th>
+        <th>Reporter</th>
+        <th>Owner</th>
         <th>Date</th>
         <th>Actions</th>
       </tr>
       </thead>
       <tbody id="reportsBody">
-      <tr   th:each="a : ${showAllReports}">
-        <!-- Reports will be populated here -->
-        <!--&lt;!&ndash;    <td th:text="${a.reportMaster.owner}"></td>&ndash;&gt;-->
-        <!--&lt;!&ndash;    <td th:text="${a.reportMaster.reporter}"></td>&ndash;&gt;-->
+      <tr   th:each="a : ${reportList}">
         <td th:text="${a.reason}"></td>
+        <td th:text="${a.reporter.username}"></td>
+        <td th:text="${a.owner.username}"></td>
         <td th:text="${a.report_date}"></td>
 
         <td>
           <div class="action-buttons">
-<!--            <a th:href="@{/delete/{admin_id} (admin_id=${a.admin_id})}">-->
-<!--              <button class="btn btn-action">Delete</button>-->
-<!--            </a>-->
+            <!--            <a th:href="@{/delete/{admin_id} (admin_id=${a.admin_id})}">-->
+            <!--              <button class="btn btn-action">Delete</button>-->
+            <!--            </a>-->
             <button class="btn btn-action">Delete</button>
             <button class="btn btn-view">Warning</button>
           </div>
