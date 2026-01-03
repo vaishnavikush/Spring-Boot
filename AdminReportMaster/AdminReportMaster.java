@@ -2,6 +2,7 @@ package com.example.kaisi_lagi.AdminReportMaster;
 
 import com.example.kaisi_lagi.ReportMaster.ReportMaster;
 import com.example.kaisi_lagi.ReviewMaster.ReviewMaster;
+import com.example.kaisi_lagi.UserMaster.UserMaster;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,9 @@ public class AdminReportMaster {
 
     @ManyToOne
     private ReviewMaster reviewMaster;
+
+//    @ManyToOne
+//    private UserMaster userMaster;
 
     public Long getAdmin_id() {
         return admin_id;
@@ -62,4 +66,12 @@ public class AdminReportMaster {
 
     public AdminReportMaster() {
     }
+
+//    public UserMaster getUserMaster() {
+//        return userMaster;
+//    }
+//
+//    public void setUserMaster(UserMaster userMaster) {
+//        this.userMaster = userMaster;
+//    }
 }
