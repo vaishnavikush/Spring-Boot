@@ -322,11 +322,16 @@
 
         <td>
           <div class="action-buttons">
-            <!--            <a th:href="@{/delete/{admin_id} (admin_id=${a.admin_id})}">-->
-            <!--              <button class="btn btn-action">Delete</button>-->
-            <!--            </a>-->
-            <button class="btn btn-action">Delete</button>
-            <button class="btn btn-view">Warning</button>
+                        <a th:href="@{/deletereport/{report_id} (report_id=${a.report_id})}">
+                          <button class="btn btn-action">Delete</button>
+                        </a>
+<!--            <button class="btn btn-action">Delete</button>-->
+<!--            <button class="btn btn-view">-->
+<!--              <a th:href="@{/sendWarningMail/{owner}(owner=${a.owner.id})}">Warning</a>-->
+<!--            </button>-->
+            <button class="btn btn-view">
+              <a th:href="@{/sendWarningMail/{report_id}(report_id=${a.report_id})}">Warning</a>
+            </button>
           </div>
         </td>
       </tbody>
@@ -334,6 +339,72 @@
   </div>
 </div>
 
+<!-- SweetAlert2 library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Your custom SweetAlert logic -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+      // DELETE BUTTON ALERT
+      document.querySelectorAll(".btn-action").forEach(button => {
+          button.addEventListener("click", function (e) {
+              e.preventDefault();
+
+              const link = this.closest("a");
+              if (!link) return;
+
+              const url = link.getAttribute("href");
+
+              Swal.fire({
+                  title: "Are you sure?",
+                  text: "This report will be permanently deleted!",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#d33",
+                  cancelButtonColor: "#3085d6",
+                  confirmButtonText: "Yes, delete it!",
+                  cancelButtonText: "Cancel"
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      window.location.href = url;
+                  }
+              });
+          });
+      });
+
+      // WARNING BUTTON ALERT
+      document.querySelectorAll(".btn-view").forEach(button => {
+          button.addEventListener("click", function (e) {
+              e.preventDefault();
+
+              const link = this.querySelector("a");
+              if (!link) return;
+
+              const url = link.getAttribute("href");
+
+              Swal.fire({
+                  title: "Send Warning?",
+                  text: "A warning email will be sent to the user.",
+                  icon: "question",
+                  showCancelButton: true,
+                  confirmButtonColor: "#f39c12",
+                  cancelButtonColor: "#3085d6",
+                  confirmButtonText: "Yes, send warning",
+                  cancelButtonText: "Cancel"
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      window.location.href = url;
+                  }
+              });
+          });
+      });
+
+  });
+</script>
+
+</body>
+</html>
 
 </body>
 </html>
