@@ -828,12 +828,40 @@ a.btn:hover {
 a * {
   transition: inherit;
 }
+
+        /* ===============================
+   FIX UNWANTED UNDERLINES
+   =============================== */
+
+.winner-card a,
+.rank-row a {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.winner-card a *,
+.rank-row a * {
+  text-decoration: none !important;
+}
+
+/* Prevent underline artifacts with gradient text */
+.winner-name,
+.name {
+  text-decoration: none !important;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+/* Chrome underline artifact fix */
+.winner-name::after,
+.name::after {
+  content: none !important;
+}
     </style>
 </head>
 
 <body>
-
-<!--    NAVBAR   -->
+<!-- NAVBAR -->
 <div th:replace="~{fragments/navbar :: nav}"></div>
 
 <div class="wrapper" th:attr="data-tab=${tab}">
@@ -848,33 +876,31 @@ a * {
     <div class="tabs">
         <a class="tab-btn"
            th:classappend="${tab=='movies'} ? ' active' : ''"
-           th:href="@{/showpeoplerevi(tab='movies', sort=${sort})}">
-            🎬 Movies
-        </a>
+           th:href="@{/showpeoplerevi(tab='movies', sort=${sort})}">🎬 Movies</a>
+
+        <a class="tab-btn"
+           th:classappend="${tab=='webseries'} ? ' active' : ''"
+           th:href="@{/showpeoplerevi(tab='webseries', sort=${sort})}">🌐 Web Series</a>
+
+        <a class="tab-btn"
+           th:classappend="${tab=='serial'} ? ' active' : ''"
+           th:href="@{/showpeoplerevi(tab='serial', sort=${sort})}">📺 Serial</a>
 
         <a class="tab-btn"
            th:classappend="${tab=='actor'} ? ' active' : ''"
-           th:href="@{/showpeoplerevi(tab='actor', sort=${sort})}">
-            🎭 Actors
-        </a>
+           th:href="@{/showpeoplerevi(tab='actor', sort=${sort})}">🎭 Actors</a>
 
         <a class="tab-btn"
            th:classappend="${tab=='actress'} ? ' active' : ''"
-           th:href="@{/showpeoplerevi(tab='actress', sort=${sort})}">
-            👩‍🦰 Actresses
-        </a>
+           th:href="@{/showpeoplerevi(tab='actress', sort=${sort})}">👩‍🦰 Actresses</a>
 
         <a class="tab-btn"
            th:classappend="${tab=='director'} ? ' active' : ''"
-           th:href="@{/showpeoplerevi(tab='director', sort=${sort})}">
-            🎥 Directors
-        </a>
+           th:href="@{/showpeoplerevi(tab='director', sort=${sort})}">🎥 Directors</a>
 
         <a class="tab-btn"
            th:classappend="${tab=='music'} ? ' active' : ''"
-           th:href="@{/showpeoplerevi(tab='music', sort=${sort})}">
-            🎧 Music Directors
-        </a>
+           th:href="@{/showpeoplerevi(tab='music', sort=${sort})}">🎧 Music Directors</a>
     </div>
 
     <!-- Sort Dropdown -->
@@ -888,36 +914,30 @@ a * {
         </select>
     </div>
 
-    <!-- MOVIES -->
-    <div id="movies" class="container-content" th:classappend="${tab=='movies'} ? ' active' : ''">
-        <!-- Top 3 Winners -->
-        <div class="top-winners-section">
-            <div class="winners-wrapper">
-                <div th:each="m, iterStat : ${movieshow}" th:if="${iterStat.index < 3}" class="winner-card"
-                     th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2'  : ' position-3' }">
-                    <a th:href="@{/movies/{movie_id}(movie_id=${m.movieId})}">
-                        <div class="position-number" th:text="${iterStat.index + 1}"></div>
-                        <div class="winner-avatar">
-                            <img th:src="@{/getimagesok/{id}(id=${m.movieId})}" alt="movie image">
-                        </div>
-                        <div class="winner-name" th:text="${m.movieName}"></div>
-                        <div class="winner-role">
-                            <span th:text="${m.genre}"></span> | <span th:text="${m.language}"></span>
-                        </div>
-                        <div class="winner-stars">
-                            <span th:utext="${#strings.repeat('★', movieAvgRatings[m.movieId].intValue())}"></span>
-                            <span th:utext="${#strings.repeat('☆', 5 - movieAvgRatings[m.movieId].intValue())}"></span>
-                        </div>
-                        <div class="winner-rating">
-                            <span th:text="${#numbers.formatDecimal(movieAvgRatings[m.movieId], 1, 1)}"></span> / 5
-                        </div>
-                    </a>
+    <!-- MOVIE / WEB SERIES / SERIAL SECTION -->
+    <div th:if="${movieshow != null}">
+        <div th:each="m, iterStat : ${movieshow}" th:if="${iterStat.index < 3}" class="winner-card">
+            <a th:href="@{/movies/{movie_id}(movie_id=${m.movieId})}">
+                <div class="position-number" th:text="${iterStat.index + 1}"></div>
+                <div class="winner-avatar">
+                    <img th:src="@{/getimagesok/{id}(id=${m.movieId})}" alt="movie image">
                 </div>
-            </div>
+                <div class="winner-name" th:text="${m.movieName}"></div>
+                <div class="winner-role">
+                    <span th:text="${m.genre}"></span> | <span th:text="${m.language}"></span>
+                </div>
+                <div class="winner-stars">
+                    <span th:utext="${#strings.repeat('★', movieAvgRatings[m.movieId].intValue())}"></span>
+                    <span th:utext="${#strings.repeat('☆', 5 - movieAvgRatings[m.movieId].intValue())}"></span>
+                </div>
+                <div class="winner-rating">
+                    <span th:text="${#numbers.formatDecimal(movieAvgRatings[m.movieId], 1, 1)}"></span> / 5
+                </div>
+            </a>
         </div>
 
-        <!-- Rest of the list -->
-        <div class="rest-section" th:if="${#lists.size(movieshow) > 3}">
+        <!-- Rest of Movies -->
+        <div class="rest-section" th:if="${movieshow != null and #lists.size(movieshow) > 3}">
             <div class="section-divider">Other Top Movies</div>
             <div th:each="m, iterStat : ${movieshow}" th:if="${iterStat.index >= 3}" class="rank-row">
                 <a th:href="@{/movies/{movie_id}(movie_id=${m.movieId})}">
@@ -944,285 +964,51 @@ a * {
             </div>
         </div>
     </div>
-</div>
 
-
-<!-- ACTORS -->
-<div id="actor" class="container-content" th:classappend="${tab=='actor'} ? ' active' : ''">
-
-    <!-- Top 3 Actors -->
-    <div class="top-winners-section">
-        <div class="winners-wrapper">
-
-            <div th:each="p, iterStat : ${peopleshow}"
-                 th:if="${iterStat.index < 3}"
-                 class="winner-card"
-                 th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2' : ' position-3' }">
-
-                <div class="position-number" th:text="${iterStat.index + 1}"></div>
-
-                <div class="winner-avatar">
-                    <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-                </div>
-
-                <div class="winner-name" th:text="${p.peopleName}"></div>
-
-                <div class="winner-role">Actor</div>
-
-                <div class="winner-stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="winner-rating">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
+    <!-- PEOPLE SECTION (Actor / Actress / Director / Music Director) -->
+    <div th:if="${peopleshow != null}">
+        <div th:each="p, iterStat : ${peopleshow}" th:if="${iterStat.index < 3}" class="winner-card">
+            <div class="position-number" th:text="${iterStat.index + 1}"></div>
+            <div class="winner-avatar">
+                <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
             </div>
-
+            <div class="winner-name" th:text="${p.peopleName}"></div>
+            <div class="winner-role" th:text="${p.role}"></div>
+            <div class="winner-stars">
+                <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
+                <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
+            </div>
+            <div class="winner-rating">
+                <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
+            </div>
         </div>
-    </div>
 
-    <!-- Other Actors -->
-    <div class="rest-section" th:if="${#lists.size(peopleshow) > 3}">
-        <div class="section-divider">Other Top Actors</div>
-
-        <div th:each="p, iterStat : ${peopleshow}"
-             th:if="${iterStat.index >= 3}"
-             class="rank-row">
-
-            <img class="profile-img" th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-
-            <div class="medal">
-                <span th:if="${roleMedals['Actor']['GOLD'] == p.pid}">🥇</span>
-                <span th:if="${roleMedals['Actor']['SILVER'] == p.pid}">🥈</span>
-                <span th:if="${roleMedals['Actor']['BRONZE'] == p.pid}">🥉</span>
-            </div>
-
-            <div class="details">
-                <div class="name" th:text="${p.peopleName}"></div>
-                <div class="role">Actor</div>
-
-                <div class="stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
+        <div class="rest-section" th:if="${peopleshow != null and #lists.size(peopleshow) > 3}">
+            <div class="section-divider">Other Top <span th:text="${tab}"></span></div>
+            <div th:each="p, iterStat : ${peopleshow}" th:if="${iterStat.index >= 3}" class="rank-row">
+                <img class="profile-img" th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
+                <div class="medal">
+                    <span th:if="${roleMedals[p.role]['GOLD'] == p.pid}">🥇</span>
+                    <span th:if="${roleMedals[p.role]['SILVER'] == p.pid}">🥈</span>
+                    <span th:if="${roleMedals[p.role]['BRONZE'] == p.pid}">🥉</span>
                 </div>
-
-                <div class="rating-number">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
+                <div class="details">
+                    <div class="name" th:text="${p.peopleName}"></div>
+                    <div class="role" th:text="${p.role}"></div>
+                    <div class="stars">
+                        <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
+                        <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
+                    </div>
+                    <div class="rating-number">
+                        <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 
 </div>
 
-<!-- ACTRESSES -->
-<div id="actress" class="container-content" th:classappend="${tab=='actress'} ? ' active' : ''">
-
-    <!-- Top 3 Actresses -->
-    <div class="top-winners-section">
-        <div class="winners-wrapper">
-
-            <div th:each="p, iterStat : ${peopleshow}"
-                 th:if="${iterStat.index < 3}"
-                 class="winner-card"
-                 th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2' : ' position-3' }">
-
-                <div class="position-number" th:text="${iterStat.index + 1}"></div>
-
-                <div class="winner-avatar">
-                    <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-                </div>
-
-                <div class="winner-name" th:text="${p.peopleName}"></div>
-
-                <div class="winner-role">Actress</div>
-
-                <div class="winner-stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="winner-rating">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Other Actresses -->
-    <div class="rest-section" th:if="${#lists.size(peopleshow) > 3}">
-        <div class="section-divider">Other Top Actresses</div>
-
-        <div th:each="p, iterStat : ${peopleshow}"
-             th:if="${iterStat.index >= 3}"
-             class="rank-row">
-
-            <img class="profile-img" th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-
-            <div class="medal">
-                <span th:if="${roleMedals['Actress']['GOLD'] == p.pid}">🥇</span>
-                <span th:if="${roleMedals['Actress']['SILVER'] == p.pid}">🥈</span>
-                <span th:if="${roleMedals['Actress']['BRONZE'] == p.pid}">🥉</span>
-            </div>
-
-            <div class="details">
-                <div class="name" th:text="${p.peopleName}"></div>
-                <div class="role">Actress</div>
-
-                <div class="stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="rating-number">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-</div>
-
-
-<div id="director" class="container-content" th:classappend="${tab=='director'} ? ' active' : ''">
-
-    <!-- Top 3 Director Winners -->
-    <div class="top-winners-section">
-        <div class="winners-wrapper">
-            <div th:each="p, iterStat : ${peopleshow}"
-                 th:if="${iterStat.index < 3}"
-                 class="winner-card"
-                 th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2'  : ' position-3' }">
-
-                <div class="position-number" th:text="${iterStat.index + 1}"></div>
-
-                <div class="winner-avatar">
-                    <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-                </div>
-
-                <div class="winner-name" th:text="${p.peopleName}"></div>
-
-                <div class="winner-role">Director</div>
-
-                <div class="winner-stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="winner-rating">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Rest of Directors -->
-    <div class="rest-section" th:if="${#lists.size(peopleshow) > 3}">
-        <div class="section-divider">Other Top Directors</div>
-
-        <div th:each="p, iterStat : ${peopleshow}"
-             th:if="${iterStat.index >= 3}"
-             class="rank-row">
-
-            <img class="profile-img" th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-
-            <div class="medal">
-                <span th:if="${roleMedals['Director']['GOLD'] == p.pid}">🥇</span>
-                <span th:if="${roleMedals['Director']['SILVER'] == p.pid}">🥈</span>
-                <span th:if="${roleMedals['Director']['BRONZE'] == p.pid}">🥉</span>
-            </div>
-
-            <div class="details">
-                <div class="name" th:text="${p.peopleName}"></div>
-                <div class="role">Director</div>
-
-                <div class="stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="rating-number">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-
-<!-- MUSIC DIRECTORS -->
-<div id="music" class="container-content" th:classappend="${tab=='music'} ? ' active' : ''">
-
-    <!-- Top 3 Music Director Winners -->
-    <div class="top-winners-section">
-        <div class="winners-wrapper">
-            <div th:each="p, iterStat : ${peopleshow}"
-                 th:if="${iterStat.index < 3}"
-                 class="winner-card"
-                 th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2'  : ' position-3' }">
-
-                <div class="position-number" th:text="${iterStat.index + 1}"></div>
-
-                <div class="winner-avatar">
-                    <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-                </div>
-
-                <div class="winner-name" th:text="${p.peopleName}"></div>
-
-                <div class="winner-role">Music Director</div>
-
-                <div class="winner-stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="winner-rating">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Rest of Music Directors -->
-    <div class="rest-section" th:if="${#lists.size(peopleshow) > 3}">
-        <div class="section-divider">Other Top Music Directors</div>
-
-        <div th:each="p, iterStat : ${peopleshow}"
-             th:if="${iterStat.index >= 3}"
-             class="rank-row">
-
-            <img class="profile-img" th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-
-            <div class="medal">
-                <span th:if="${roleMedals['Music Director']['GOLD'] == p.pid}">🥇</span>
-                <span th:if="${roleMedals['Music Director']['SILVER'] == p.pid}">🥈</span>
-                <span th:if="${roleMedals['Music Director']['BRONZE'] == p.pid}">🥉</span>
-            </div>
-
-            <div class="details">
-                <div class="name" th:text="${p.peopleName}"></div>
-                <div class="role">Music Director</div>
-
-                <div class="stars">
-                    <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-                </div>
-
-                <div class="rating-number">
-                    <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-</div>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
