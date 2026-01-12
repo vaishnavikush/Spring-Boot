@@ -23,6 +23,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.apache.tomcat.util.IntrospectionUtils.capitalize;
+
 @Controller
 public class ReviewController {
 
@@ -39,110 +41,285 @@ public class ReviewController {
     @Autowired
     private MovieCastRepository movieCastRepository;
 
-    // ---------------- PEOPLE & MOVIE RATINGS DISPLAY ----------------
     @GetMapping("/showpeoplerevi")
     public String showPeopleAndMovies(
             @RequestParam(defaultValue = "movies") String tab,
             @RequestParam(defaultValue = "rating_desc") String sort,
             Model model) {
 
+        // ===================== PEOPLE =====================
         List<PeopleMaster> peopleList = peopleRepository.findAll();
+
         Map<Long, Double> peopleAvgRatings = new HashMap<>();
+        Map<Long, Long> peopleVotes = new HashMap<>();
+
         for (PeopleMaster p : peopleList) {
             Double avg10 = reviewRepository.getAvgRatingByPeople(p.getPid());
+            Long votes = reviewRepository.getVoteCountByPeople(p.getPid());
+
             peopleAvgRatings.put(p.getPid(), avg10 == null ? 0 : avg10 / 2);
+            peopleVotes.put(p.getPid(), votes == null ? 0L : votes);
         }
 
+        // ===================== MOVIES =====================
         List<MovieMaster> movieList = movieRepository.findAll();
+
         Map<Long, Double> movieAvgRatings = new HashMap<>();
+        Map<Long, Long> movieVotes = new HashMap<>();
+
         for (MovieMaster m : movieList) {
             Double avg10 = reviewRepository.getAvgRatingByMovie(m.getMovieId());
+            Long votes = reviewRepository.getVoteCountByMovie(m.getMovieId());
+
             movieAvgRatings.put(m.getMovieId(), avg10 == null ? 0 : avg10 / 2);
+            movieVotes.put(m.getMovieId(), votes == null ? 0L : votes);
         }
 
-        model.addAttribute("peopleshow", peopleList);
-        model.addAttribute("peopleAvgRatings", peopleAvgRatings);
-        model.addAttribute("movieshow", movieList);
-        model.addAttribute("movieAvgRatings", movieAvgRatings);
-
-        // Top 3 medals
-        model.addAttribute("peopleMedals", getTop3Medals(peopleAvgRatings));
-        model.addAttribute("movieMedals", getTop3Medals(movieAvgRatings));
-
-        // Role-wise medals
+        // ===================== GROUP PEOPLE BY ROLE =====================
         Map<String, List<PeopleMaster>> groupedByRole = new HashMap<>();
         for (PeopleMaster p : peopleList) {
-            groupedByRole.computeIfAbsent(p.getRole(), k -> new ArrayList<>()).add(p);
+            groupedByRole
+                    .computeIfAbsent(p.getRole(), k -> new ArrayList<>())
+                    .add(p);
         }
+
+        // ===================== GROUP MOVIES BY CATEGORY =====================
+//        Map<String, List<MovieMaster>> groupedByCategory = new HashMap<>();
+//
+//        for (MovieMaster m : movieList) {
+//            if (m.getCategory() != null) {
+//                String categoryName = m.getCategory().getName(); // ✅ correct getter
+//                groupedByCategory
+//                        .computeIfAbsent(categoryName, k -> new ArrayList<>())
+//                        .add(m);
+//            }
+//        }
+
+        // ===================== GROUP MOVIES BY CATEGORY =====================
+        Map<String, List<MovieMaster>> groupedByCategory = new HashMap<>();
+
+        for (MovieMaster m : movieList) {
+            if (m.getCategory() != null && m.getCategory().getName() != null) {
+
+                String categoryName = m.getCategory()
+                        .getName()
+                        .trim()
+                        .toLowerCase();   // ✅ FIX HERE
+
+                groupedByCategory
+                        .computeIfAbsent(categoryName, k -> new ArrayList<>())
+                        .add(m);
+            }
+        }
+
+
+        // ===================== MODEL COMMON =====================
+        model.addAttribute("peopleAvgRatings", peopleAvgRatings);
+        model.addAttribute("peopleVotes", peopleVotes);
+        model.addAttribute("movieAvgRatings", movieAvgRatings);
+        model.addAttribute("movieVotes", movieVotes);
+
+        // ===================== GLOBAL MEDALS =====================
+        model.addAttribute("peopleMedals",
+                getTop3Medals(peopleAvgRatings, peopleVotes));
+
+        model.addAttribute("movieMedals",
+                getTop3Medals(movieAvgRatings, movieVotes));
+
+        // ===================== ROLE-WISE PEOPLE MEDALS =====================
         Map<String, Map<String, Long>> roleMedals = new HashMap<>();
         for (String role : groupedByRole.keySet()) {
-            roleMedals.put(role, getTop3MedalsForPeople(groupedByRole.get(role), peopleAvgRatings));
+            roleMedals.put(
+                    role,
+                    getTop3MedalsForPeople(
+                            groupedByRole.get(role),
+                            peopleAvgRatings,
+                            peopleVotes
+                    )
+            );
         }
         model.addAttribute("roleMedals", roleMedals);
 
-        // Apply sorting
+        // ===================== CATEGORY-WISE MOVIE MEDALS =====================
+        Map<String, Map<String, Long>> categoryMedals = new HashMap<>();
+
+        for (String category : groupedByCategory.keySet()) {
+
+            Map<Long, Double> avgMap = new HashMap<>();
+            Map<Long, Long> voteMap = new HashMap<>();
+
+            for (MovieMaster m : groupedByCategory.get(category)) {
+                avgMap.put(m.getMovieId(), movieAvgRatings.get(m.getMovieId()));
+                voteMap.put(m.getMovieId(), movieVotes.get(m.getMovieId()));
+            }
+
+            categoryMedals.put(category, getTop3Medals(avgMap, voteMap));
+        }
+        model.addAttribute("categoryMedals", categoryMedals);
+
+        // ===================== TAB & SORT LOGIC =====================
         switch (tab) {
+
+            // ---------- MOVIE TABS ----------
+//            case "movies":
+//            case "webseries":
+//            case "serial":
+//
+//                String category =
+//                        tab.equals("movies") ? "Movie" :
+//                                tab.equals("webseries") ? "Web Series" :
+//                                        "Serial";
+//
+//                List<MovieMaster> movieTabList =
+//                        groupedByCategory.getOrDefault(category, new ArrayList<>());
+//
+//                sortMovies(movieTabList, movieAvgRatings, movieVotes, sort);
+//                model.addAttribute("movieshow", movieTabList);
+//                break;
+
             case "movies":
-                sortMovies(movieList, movieAvgRatings, sort);
+            case "webseries":
+            case "serial":
+
+                String category =
+                        tab.equals("movies") ? "movie" :
+                                tab.equals("webseries") ? "web series" :
+                                        "serial";
+
+                List<MovieMaster> movieTabList =
+                        groupedByCategory.getOrDefault(category, new ArrayList<>());
+
+                sortMovies(movieTabList, movieAvgRatings, movieVotes, sort);
+                model.addAttribute("movieshow", movieTabList);
                 break;
+
+
+            // ---------- PEOPLE TABS ----------
             case "actor":
             case "actress":
             case "director":
             case "music":
-                List<PeopleMaster> list = groupedByRole.getOrDefault(
-                        tab.equals("music") ? "Music Director" : capitalize(tab), new ArrayList<>());
-                sortPeople(list, peopleAvgRatings, sort);
-                model.addAttribute("peopleshow", list);
+
+                String role =
+                        tab.equals("music") ? "Music Director" : capitalize(tab);
+
+                List<PeopleMaster> peopleTabList =
+                        groupedByRole.getOrDefault(role, new ArrayList<>());
+
+                sortPeople(peopleTabList, peopleAvgRatings, peopleVotes, sort);
+                model.addAttribute("peopleshow", peopleTabList);
                 break;
         }
 
         model.addAttribute("tab", tab);
         model.addAttribute("sort", sort);
+
         return "ReviewShowPeopleFinal";
     }
+    private Map<String, Long> getTop3Medals(
+            Map<Long, Double> avgRatings,
+            Map<Long, Long> votes) {
 
-    private Map<String, Long> getTop3Medals(Map<Long, Double> avgRatings) {
         Map<String, Long> medals = new HashMap<>();
+
         avgRatings.entrySet().stream()
-                .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
+                .sorted(
+                        Map.Entry.<Long, Double>comparingByValue().reversed()
+                                .thenComparing(
+                                        e -> votes.get(e.getKey()),
+                                        Comparator.reverseOrder()
+                                )
+                )
                 .limit(3)
                 .forEachOrdered(e -> {
                     if (!medals.containsKey("GOLD")) medals.put("GOLD", e.getKey());
                     else if (!medals.containsKey("SILVER")) medals.put("SILVER", e.getKey());
                     else medals.put("BRONZE", e.getKey());
                 });
+
         return medals;
     }
 
-    private Map<String, Long> getTop3MedalsForPeople(List<PeopleMaster> list, Map<Long, Double> avgRatings) {
+    private Map<String, Long> getTop3MedalsForPeople(
+            List<PeopleMaster> list,
+            Map<Long, Double> avgRatings,
+            Map<Long, Long> votes) {
+
         Map<String, Long> medals = new HashMap<>();
+
         list.stream()
-                .map(p -> Map.entry(p.getPid(), avgRatings.get(p.getPid())))
-                .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
+                .sorted(
+                        Comparator
+                                .comparingDouble((PeopleMaster p) -> avgRatings.get(p.getPid()))
+                                .reversed()
+                                .thenComparing(
+                                        p -> votes.get(p.getPid()),
+                                        Comparator.reverseOrder()
+                                )
+                )
                 .limit(3)
-                .forEachOrdered(e -> {
-                    if (!medals.containsKey("GOLD")) medals.put("GOLD", e.getKey());
-                    else if (!medals.containsKey("SILVER")) medals.put("SILVER", e.getKey());
-                    else medals.put("BRONZE", e.getKey());
+                .forEachOrdered(p -> {
+                    if (!medals.containsKey("GOLD")) medals.put("GOLD", p.getPid());
+                    else if (!medals.containsKey("SILVER")) medals.put("SILVER", p.getPid());
+                    else medals.put("BRONZE", p.getPid());
                 });
+
         return medals;
     }
 
-    private void sortPeople(List<PeopleMaster> list, Map<Long, Double> avg, String sort) {
+    private void sortPeople(
+            List<PeopleMaster> list,
+            Map<Long, Double> avg,
+            Map<Long, Long> votes,
+            String sort) {
+
         switch (sort) {
-            case "rating_desc" -> list.sort(Comparator.comparingDouble((PeopleMaster p) -> avg.get(p.getPid())).reversed());
-            case "rating_asc" -> list.sort(Comparator.comparingDouble(p -> avg.get(p.getPid())));
-            case "name_asc" -> list.sort(Comparator.comparing(PeopleMaster::getPeopleName));
-            case "name_desc" -> list.sort(Comparator.comparing(PeopleMaster::getPeopleName).reversed());
+            case "rating_desc" ->
+                    list.sort(
+                            Comparator.comparingDouble((PeopleMaster p) -> avg.get(p.getPid()))
+                                    .reversed()
+                                    .thenComparing(p -> votes.get(p.getPid()), Comparator.reverseOrder())
+                    );
+
+            case "rating_asc" ->
+                    list.sort(
+                            Comparator.comparingDouble((PeopleMaster p) -> avg.get(p.getPid()))
+                                    .thenComparing(p -> votes.get(p.getPid()), Comparator.reverseOrder())
+                    );
+
+            case "name_asc" ->
+                    list.sort(Comparator.comparing(PeopleMaster::getPeopleName));
+
+            case "name_desc" ->
+                    list.sort(Comparator.comparing(PeopleMaster::getPeopleName).reversed());
         }
     }
 
-    private void sortMovies(List<MovieMaster> list, Map<Long, Double> avg, String sort) {
+    private void sortMovies(
+            List<MovieMaster> list,
+            Map<Long, Double> avg,
+            Map<Long, Long> votes,
+            String sort) {
+
         switch (sort) {
-            case "rating_desc" -> list.sort(Comparator.comparingDouble((MovieMaster m) -> avg.get(m.getMovieId())).reversed());
-            case "rating_asc" -> list.sort(Comparator.comparingDouble(m -> avg.get(m.getMovieId())));
-            case "name_asc" -> list.sort(Comparator.comparing(MovieMaster::getMovieName));
-            case "name_desc" -> list.sort(Comparator.comparing(MovieMaster::getMovieName).reversed());
+            case "rating_desc" ->
+                    list.sort(
+                            Comparator.comparingDouble((MovieMaster m) -> avg.get(m.getMovieId()))
+                                    .reversed()
+                                    .thenComparing(m -> votes.get(m.getMovieId()), Comparator.reverseOrder())
+                    );
+
+            case "rating_asc" ->
+                    list.sort(
+                            Comparator.comparingDouble((MovieMaster m) -> avg.get(m.getMovieId()))
+                                    .thenComparing(m -> votes.get(m.getMovieId()), Comparator.reverseOrder())
+                    );
+
+            case "name_asc" ->
+                    list.sort(Comparator.comparing(MovieMaster::getMovieName));
+
+            case "name_desc" ->
+                    list.sort(Comparator.comparing(MovieMaster::getMovieName).reversed());
         }
     }
 
@@ -150,6 +327,8 @@ public class ReviewController {
         if (str == null || str.isEmpty()) return str;
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
+
+
 
     // ---------------- PEOPLE IMAGE ----------------
     @GetMapping("/getimagerevi/{pid}")
