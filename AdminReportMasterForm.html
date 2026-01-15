@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Reports Dashboard</title>
+  <link rel="stylesheet" th:href="@{/css/admin-reports.css}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * {
         margin: 0;
@@ -280,11 +282,19 @@
 </head>
 <body>
 <div class="container">
+
   <header>
     <h1>Reports Dashboard</h1>
     <p class="subtitle">Manage and review user reports</p>
   </header>
 
+<!--  &lt;!&ndash; STATS &ndash;&gt;-->
+<!--  <div class="stats">-->
+<!--    <div class="stat-card">-->
+<!--      <div class="stat-number" th:text="${reportList.size()}">0</div>-->
+<!--      <div class="stat-label">Total Reports</div>-->
+<!--    </div>-->
+<!--  </div>-->
   <div class="stats">
     <div class="stat-card">
       <div class="stat-number" th:text="${reportList.size()}">47</div>
@@ -301,6 +311,7 @@
   </div>
 
 
+  <!-- TABLE -->
   <div class="reports-table">
     <table>
       <thead>
@@ -312,99 +323,113 @@
         <th>Actions</th>
       </tr>
       </thead>
-      <tbody id="reportsBody">
-      <tr   th:each="a : ${reportList}">
+
+      <tbody>
+      <tr th:each="a : ${reportList}">
         <td th:text="${a.reason}"></td>
         <td th:text="${a.reporter.username}"></td>
         <td th:text="${a.owner.username}"></td>
         <td th:text="${a.report_date}"></td>
 
         <td>
-          <div class="action-buttons">
-                        <a th:href="@{/deletereport/{report_id} (report_id=${a.report_id})}">
-                          <button class="btn btn-action">Delete</button>
-                        </a>
-<!--            <button class="btn btn-action">Delete</button>-->
-<!--            <button class="btn btn-view">-->
-<!--              <a th:href="@{/sendWarningMail/{owner}(owner=${a.owner.id})}">Warning</a>-->
-<!--            </button>-->
-            <button class="btn btn-view">
-              <a th:href="@{/sendWarningMail/{report_id}(report_id=${a.report_id})}">Warning</a>
+          <!-- DELETE -->
+          <form th:id="'deleteForm-' + ${a.report_id}"
+                th:action="@{/deletereport/{id}(id=${a.report_id})}"
+                method="post"
+                style="display:inline;">
+            <button type="button"
+                    class="btn btn-action"
+                    th:attr="onclick='confirmDelete(\'deleteForm-' + ${a.report_id} + '\')'">
+              Delete
             </button>
-          </div>
+          </form>
+
+          <!-- WARNING -->
+<!--          <a class="btn btn-view"-->
+<!--             th:href="@{/sendWarningMail/{id}(id=${a.report_id})}">-->
+<!--            Warning-->
+<!--          </a>-->
+          <a class="btn btn-view"
+             href="javascript:void(0);"
+             th:data-url="@{/sendWarningMail/{id}(id=${a.report_id})}"
+             onclick="confirmWarning(this);">
+            Warning
+          </a>
+
+
+          <!-- REJECT -->
+          <a class="btn btn-view"
+             href="javascript:void(0);"
+             th:data-url="@{/reject/{id}(id=${a.report_id})}"
+             onclick="confirmReject(this);">
+            Reject
+          </a>
         </td>
+      </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- SweetAlert2 library -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- Your custom SweetAlert logic -->
+<!-- DELETE CONFIRM -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-
-      // DELETE BUTTON ALERT
-      document.querySelectorAll(".btn-action").forEach(button => {
-          button.addEventListener("click", function (e) {
-              e.preventDefault();
-
-              const link = this.closest("a");
-              if (!link) return;
-
-              const url = link.getAttribute("href");
-
-              Swal.fire({
-                  title: "Are you sure?",
-                  text: "This report will be permanently deleted!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#d33",
-                  cancelButtonColor: "#3085d6",
-                  confirmButtonText: "Yes, delete it!",
-                  cancelButtonText: "Cancel"
-              }).then((result) => {
-                  if (result.isConfirmed) {
-                      window.location.href = url;
-                  }
-              });
-          });
+  function confirmDelete(formId) {
+      Swal.fire({
+          title: 'Are you sure?',
+          text: 'This report will be permanently deleted.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Delete'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              document.getElementById(formId).submit();
+          }
       });
-
-      // WARNING BUTTON ALERT
-      document.querySelectorAll(".btn-view").forEach(button => {
-          button.addEventListener("click", function (e) {
-              e.preventDefault();
-
-              const link = this.querySelector("a");
-              if (!link) return;
-
-              const url = link.getAttribute("href");
-
-              Swal.fire({
-                  title: "Send Warning?",
-                  text: "A warning email will be sent to the user.",
-                  icon: "question",
-                  showCancelButton: true,
-                  confirmButtonColor: "#f39c12",
-                  cancelButtonColor: "#3085d6",
-                  confirmButtonText: "Yes, send warning",
-                  cancelButtonText: "Cancel"
-              }).then((result) => {
-                  if (result.isConfirmed) {
-                      window.location.href = url;
-                  }
-              });
-          });
-      });
-
-  });
+  }
 </script>
+
+<!-- REJECT CONFIRM -->
+<script>
+  function confirmReject(element) {
+      const url = element.getAttribute('data-url');
+
+      Swal.fire({
+          title: 'Reject this report?',
+          text: 'This action cannot be undone.',
+          icon: 'error',
+          showCancelButton: true,
+          confirmButtonText: 'Reject'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              window.location.href = url;
+          }
+      });
+  }
+</script>
+<script>
+  function confirmWarning(element) {
+      const url = element.getAttribute("data-url");
+
+      Swal.fire({
+          title: "Send warning email?",
+          text: "A warning email will be sent to the report owner.",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#f39c12",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Yes, send it",
+          cancelButtonText: "Cancel"
+      }).then((result) => {
+          if (result.isConfirmed) {
+              window.location.href = url;
+          }
+      });
+  }
+</script>
+
 
 </body>
 </html>
 
 </body>
-
 </html>
