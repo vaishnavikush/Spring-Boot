@@ -21,17 +21,13 @@
           box-sizing: border-box;
         }
           body {
-    <!--          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;-->
-    <!--          background: linear-gradient(135deg, #f5f7fa 0%, #eef1f5 50%, #e8ecf2 100%);-->
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #f7a6a6, #ecff7f);
-
           color: #1e293b;
           min-height: 100vh;
           padding-top:90px;
         }
     .navbar {
-                /* background: linear-gradient(135deg,#ff8929,#ffbf00,#fd1818); */
                 background-color: #f2481d;
                 margin-bottom: 40px;
             }
@@ -75,7 +71,6 @@
             .search-btn:hover {
                 color: #ffffff;
                 background-color: #f2481d;
-                /* border: 2px solid rgb(253, 64, 64); */
                 transform: scale(1.05);
             }
 
@@ -398,6 +393,10 @@
           }
         }
 
+        .winner-card a {
+          display: block;
+        }
+
         .winner-avatar {
           width: 125px;
           height: 125px;
@@ -474,7 +473,6 @@
           color: #e63956;
           margin-top: 8px;
         }
-
         /* Rest of Leaderboard */
         .rest-section {
           max-width: 900px;
@@ -741,122 +739,115 @@
           animation-delay: 0.2s;
         }
 
-
-
-
-
         /* CSS for <a> tags in Leaderboard Template */
 
-/* Default anchor styles */
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s ease;
-}
+        /* Default anchor styles */
+        a {
+          text-decoration: none;
+          color: inherit;
+          transition: all 0.3s ease;
+        }
 
-/* Winner card links */
-.winner-card a {
-  display: block;
-  color: inherit;
-}
+        /* Winner card links */
+        .winner-card a {
+          display: block;
+          color: inherit;
+        }
 
-.winner-card a:hover {
-  color: inherit;
-}
+        .winner-card a:hover {
+          color: inherit;
+        }
 
-/* Rank row links */
-.rank-row a {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  width: 100%;
-  color: inherit;
-}
+        /* Rank row links */
+        .rank-row a {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          width: 100%;
+          color: inherit;
+        }
 
-.rank-row a:hover {
-  color: inherit;
-}
+        .rank-row a:hover {
+          color: inherit;
+        }
 
-/* Tab button links */
-.tab-btn {
-  text-decoration: none;
-  color: #64748b;
-}
+        /* Tab button links */
+        .tab-btn {
+          text-decoration: none;
+          color: #64748b;
+        }
 
-.tab-btn:hover {
-  color: #e63956;
-  text-decoration: none;
-}
+        .tab-btn:hover {
+          color: #e63956;
+          text-decoration: none;
+        }
 
-.tab-btn.active {
-  color: white;
-  text-decoration: none;
-}
+        .tab-btn.active {
+          color: white;
+          text-decoration: none;
+        }
 
-/* Navbar links */
-.navbar-brand {
-  text-decoration: none;
-  color: #ffffff !important;
-}
+        /* Navbar links */
+        .navbar-brand {
+          text-decoration: none;
+          color: #ffffff !important;
+        }
 
-.navbar-brand:hover {
-  color: #ffffff !important;
-}
+        .navbar-brand:hover {
+          color: #ffffff !important;
+        }
 
-.nav-link {
-  text-decoration: none;
-  color: #ffffff !important;
-}
+        .nav-link {
+          text-decoration: none;
+          color: #ffffff !important;
+        }
 
-.nav-link:hover {
-  text-decoration: underline;
-  color: #ffffff !important;
-}
+        .nav-link:hover {
+          text-decoration: underline;
+          color: #ffffff !important;
+        }
 
-/* Button links */
-a.btn {
-  text-decoration: none;
-  color: #000;
-}
+        /* Button links */
+        a.btn {
+          text-decoration: none;
+          color: #000;
+        }
 
-a.btn:hover {
-  text-decoration: none;
-  color: #000;
-}
+        a.btn:hover {
+          text-decoration: none;
+          color: #000;
+        }
 
-/* Ensure smooth transitions on all anchor elements */
-a * {
-  transition: inherit;
-}
+        /* Ensure smooth transitions on all anchor elements */
+        a * {
+          transition: inherit;
+        }
 
-        /* ===============================
-   FIX UNWANTED UNDERLINES
-   =============================== */
+        /* FIX UNWANTED UNDERLINES */
+        .winner-card a,
+        .rank-row a {
+          text-decoration: none !important;
+          border-bottom: none !important;
+        }
 
-.winner-card a,
-.rank-row a {
-  text-decoration: none !important;
-  border-bottom: none !important;
-}
+        .winner-card a *,
+        .rank-row a * {
+          text-decoration: none !important;
+        }
 
-.winner-card a *,
-.rank-row a * {
-  text-decoration: none !important;
-}
+        /* Prevent underline artifacts with gradient text */
+        .winner-name,
+        .name {
+          text-decoration: none !important;
+          background-clip: text;
+          -webkit-background-clip: text;
+        }
 
-/* Prevent underline artifacts with gradient text */
-.winner-name,
-.name {
-  text-decoration: none !important;
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-
-/* Chrome underline artifact fix */
-.winner-name::after,
-.name::after {
-  content: none !important;
-}
+        /* Chrome underline artifact fix */
+        .winner-name::after,
+        .name::after {
+          content: none !important;
+        }
     </style>
 </head>
 
@@ -914,26 +905,32 @@ a * {
         </select>
     </div>
 
-    <!-- MOVIE / WEB SERIES / SERIAL SECTION -->
-    <div th:if="${movieshow != null}">
-        <div th:each="m, iterStat : ${movieshow}" th:if="${iterStat.index < 3}" class="winner-card">
-            <a th:href="@{/movies/{movie_id}(movie_id=${m.movieId})}">
-                <div class="position-number" th:text="${iterStat.index + 1}"></div>
-                <div class="winner-avatar">
-                    <img th:src="@{/getimagesok/{id}(id=${m.movieId})}" alt="movie image">
+    <!-- MOVIES / WEB SERIES / SERIAL SECTION -->
+    <div id="movies" class="container-content" th:classappend="${tab=='movies' or tab=='webseries' or tab=='serial'} ? ' active' : ''">
+        <!-- Top 3 Winners -->
+        <div class="top-winners-section">
+            <div class="winners-wrapper">
+                <div th:each="m, iterStat : ${movieshow}" th:if="${iterStat.index < 3}" class="winner-card"
+                     th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2'  : ' position-3' }">
+                    <a th:href="@{/movies/{movie_id}(movie_id=${m.movieId})}">
+                        <div class="position-number" th:text="${iterStat.index + 1}"></div>
+                        <div class="winner-avatar">
+                            <img th:src="@{/getimagesok/{id}(id=${m.movieId})}" alt="movie image">
+                        </div>
+                        <div class="winner-name" th:text="${m.movieName}"></div>
+                        <div class="winner-role">
+                            <span th:text="${m.genre}"></span> | <span th:text="${m.language}"></span>
+                        </div>
+                        <div class="winner-stars">
+                            <span th:utext="${#strings.repeat('★', movieAvgRatings[m.movieId].intValue())}"></span>
+                            <span th:utext="${#strings.repeat('☆', 5 - movieAvgRatings[m.movieId].intValue())}"></span>
+                        </div>
+                        <div class="winner-rating">
+                            <span th:text="${#numbers.formatDecimal(movieAvgRatings[m.movieId], 1, 1)}"></span> / 5
+                        </div>
+                    </a>
                 </div>
-                <div class="winner-name" th:text="${m.movieName}"></div>
-                <div class="winner-role">
-                    <span th:text="${m.genre}"></span> | <span th:text="${m.language}"></span>
-                </div>
-                <div class="winner-stars">
-                    <span th:utext="${#strings.repeat('★', movieAvgRatings[m.movieId].intValue())}"></span>
-                    <span th:utext="${#strings.repeat('☆', 5 - movieAvgRatings[m.movieId].intValue())}"></span>
-                </div>
-                <div class="winner-rating">
-                    <span th:text="${#numbers.formatDecimal(movieAvgRatings[m.movieId], 1, 1)}"></span> / 5
-                </div>
-            </a>
+            </div>
         </div>
 
         <!-- Rest of Movies -->
@@ -966,23 +963,30 @@ a * {
     </div>
 
     <!-- PEOPLE SECTION (Actor / Actress / Director / Music Director) -->
-    <div th:if="${peopleshow != null}">
-        <div th:each="p, iterStat : ${peopleshow}" th:if="${iterStat.index < 3}" class="winner-card">
-            <div class="position-number" th:text="${iterStat.index + 1}"></div>
-            <div class="winner-avatar">
-                <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
-            </div>
-            <div class="winner-name" th:text="${p.peopleName}"></div>
-            <div class="winner-role" th:text="${p.role}"></div>
-            <div class="winner-stars">
-                <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
-                <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
-            </div>
-            <div class="winner-rating">
-                <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
+    <div id="people" class="container-content" th:classappend="${tab=='actor' or tab=='actress' or tab=='director' or tab=='music'} ? ' active' : ''">
+        <!-- Top 3 -->
+        <div class="top-winners-section">
+            <div class="winners-wrapper">
+                <div th:each="p, iterStat : ${peopleshow}" th:if="${iterStat.index < 3}" class="winner-card"
+                     th:classappend="${iterStat.index == 0 ? ' position-1' : iterStat.index == 1 ? ' position-2' : ' position-3' }">
+                    <div class="position-number" th:text="${iterStat.index + 1}"></div>
+                    <div class="winner-avatar">
+                        <img th:src="@{/getimagerevi/{pid}(pid=${p.pid})}" alt="person image">
+                    </div>
+                    <div class="winner-name" th:text="${p.peopleName}"></div>
+                    <div class="winner-role" th:text="${p.role}"></div>
+                    <div class="winner-stars">
+                        <span th:utext="${#strings.repeat('★', peopleAvgRatings[p.pid].intValue())}"></span>
+                        <span th:utext="${#strings.repeat('☆', 5 - peopleAvgRatings[p.pid].intValue())}"></span>
+                    </div>
+                    <div class="winner-rating">
+                        <span th:text="${#numbers.formatDecimal(peopleAvgRatings[p.pid], 1, 1)}"></span> / 5
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Rest of People -->
         <div class="rest-section" th:if="${peopleshow != null and #lists.size(peopleshow) > 3}">
             <div class="section-divider">Other Top <span th:text="${tab}"></span></div>
             <div th:each="p, iterStat : ${peopleshow}" th:if="${iterStat.index >= 3}" class="rank-row">
@@ -1015,64 +1019,11 @@ a * {
         integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
 
 <script>
-    <!--  function chooseSort() {-->
-    <!--     const sort = document.getElementById("sort").value;-->
-    <!--     const wrapper = document.querySelector('.wrapper');-->
-    <!--     const tab = wrapper ? wrapper.dataset.tab || 'movies' : 'movies';-->
-    <!--     window.location.href = /showpeoplerevi?tab=${encodeURIComponent(tab)}&sort=${encodeURIComponent(sort)};-->
-    <!-- }-->
-      function chooseSort() {
-        const sort = document.getElementById("sort").value;
-        const wrapper = document.querySelector('.wrapper');
-        const tab = wrapper ? wrapper.dataset.tab || 'movies' : 'movies';
-
-        window.location.href = /showpeoplerevi?tab=${encodeURIComponent(tab)}&sort=${encodeURIComponent(sort)};
-      }
-
-
-  <!--</script>-->
-<!--&lt;!&ndash;<script>&ndash;&gt;-->
-<!--&lt;!&ndash;  function chooseSort() {&ndash;&gt;-->
-<!--&lt;!&ndash;      const sort = document.getElementById("sort").value;&ndash;&gt;-->
-<!--&lt;!&ndash;      const wrapper = document.querySelector('.wrapper');&ndash;&gt;-->
-<!--&lt;!&ndash;      const tab = wrapper ? wrapper.dataset.tab || 'movies' : 'movies';&ndash;&gt;-->
-
-<!--&lt;!&ndash;      window.location.href = /[[@{/showpeoplerevi}]]/ + ?tab=${encodeURIComponent(tab)}&sort=${encodeURIComponent(sort)};&ndash;&gt;-->
-<!--&lt;!&ndash;  }&ndash;&gt;-->
-<!--</script>-->
-<!--<script>-->
-<!--    function chooseSort() {-->
-<!--      const sort = document.getElementById("sort").value;-->
-<!--      const wrapper = document.querySelector('.wrapper');-->
-<!--      const tab = wrapper ? wrapper.dataset.tab || 'movies' : 'movies';-->
-
-<!--      // FIXED LINE ↓↓↓-->
-<!--      window.location.href = /showpeoplerevi?tab=${encodeURIComponent(tab)}&sort=${encodeURIComponent(sort)};-->
-<!--    }-->
-
-<!--    const searchIcon = document.getElementById('mobileSearchIcon');-->
-<!--    const searchDropdown = document.getElementById('mobileSearchDropdown');-->
-
-<!--    searchIcon.addEventListener('click', () => {-->
-<!--        searchDropdown.style.display =-->
-<!--            searchDropdown.style.display === 'block' ? 'none' : 'block';-->
-<!--    });-->
-<!--</script>-->
-
-<script>
     function chooseSort() {
-        // Get the selected sort value
         const sort = document.getElementById("sort").value;
-
-        // Get the current tab from the wrapper's data attribute
         const wrapper = document.querySelector('.wrapper');
         const tab = wrapper ? wrapper.dataset.tab || 'movies' : 'movies';
-
-        // Build the URL safely
-        const url = '/showpeoplerevi?tab=' + encodeURIComponent(tab) + '&sort=' + encodeURIComponent(sort);
-
-        // Redirect to the new URL
-        window.location.href = url;
+        window.location.href = '/showpeoplerevi?tab=' + encodeURIComponent(tab) + '&sort=' + encodeURIComponent(sort);
     }
 </script>
 
